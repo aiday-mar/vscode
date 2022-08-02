@@ -11,7 +11,7 @@ import { ILanguageFeaturesService } from 'vs/editor/common/services/languageFeat
 import { OutlineModel, OutlineElement } from 'vs/editor/contrib/documentSymbols/browser/outlineModel';
 import { CancellationToken, CancellationTokenSource, } from 'vs/base/common/cancellation';
 import * as dom from 'vs/base/browser/dom';
-import { EditorOption } from 'vs/editor/common/config/editorOptions';
+import { EditorOption, RenderLineNumbersType } from 'vs/editor/common/config/editorOptions';
 import { createStringBuilder } from 'vs/editor/common/core/stringBuilder';
 import { RenderLineInput, renderViewLine } from 'vs/editor/common/viewLayout/viewLineRenderer';
 import { SymbolKind } from 'vs/editor/common/languages';
@@ -274,6 +274,9 @@ class StickyScrollCodeLine {
 			newLine = sb.build();
 		}
 
+		// Consider all cases whether lineNumberPresent is true or not
+		const lineNumberPresent: RenderLineNumbersType = this._editor.getOption(EditorOption.lineNumbers).renderType;
+
 		const lineHTMLNode = document.createElement('span');
 		lineHTMLNode.style.backgroundColor = `var(--vscode-editorStickyScroll-background)`;
 		lineHTMLNode.style.overflow = 'hidden';
@@ -290,7 +293,9 @@ class StickyScrollCodeLine {
 		lineNumberHTMLNode.style.lineHeight = this._editor.getOption(EditorOption.lineHeight).toString() + 'px';
 
 		const innerLineNumberHTML = document.createElement('span');
-		innerLineNumberHTML.innerText = this._lineNumber.toString();
+		if (lineNumberPresent === RenderLineNumbersType.On) {
+			innerLineNumberHTML.innerText = this._lineNumber.toString();
+		}
 		innerLineNumberHTML.style.paddingLeft = this._editor.getLayoutInfo().lineNumbersLeft.toString() + 'px';
 		innerLineNumberHTML.style.width = this._editor.getLayoutInfo().lineNumbersWidth.toString() + 'px';
 		innerLineNumberHTML.style.backgroundColor = `var(--vscode-editorStickyScroll-background)`;
